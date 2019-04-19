@@ -1,0 +1,61 @@
+<!-- HTML for static distribution bundle build -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Swagger UI</title>
+    <link rel="stylesheet" type="text/css" href="./swagger-ui.css" >
+    <link rel="icon" type="image/png" href="./favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="./favicon-16x16.png" sizes="16x16" />
+    <style>
+      html
+      {
+        box-sizing: border-box;
+        overflow: -moz-scrollbars-vertical;
+        overflow-y: scroll;
+      }
+
+      *,
+      *:before,
+      *:after
+      {
+        box-sizing: inherit;
+      }
+
+      body
+      {
+        margin:0;
+        background: #fafafa;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="swagger-ui"></div>
+
+    <script src="./swagger-ui-bundle.js"> </script>
+    <script src="./swagger-ui-standalone-preset.js"> </script>
+    <script>
+    window.onload = function() {
+
+      // Build a system
+      const ui = SwaggerUIBundle({
+        spec: /*intellij-swagger-spec-start*/{"openapi":"3.0.1","info":{"title":"Keeper Security MSP provisioning API","description":"This API allows MSP vendors to create, inspect, and update Keeper Security MSP enterprises","version":"1.0.0"},"servers":[{"url":"https://keepersecurity.com/api/rest/msp/v1/{vendorId}"}],"paths":{"/enterprise":{"post":{"tags":["enterprise"],"summary":"Create a new Keeper MSP enterprise.","description":"Creates a new Keeper MSP enterprise.\n\nIf license contains a Free Trial product, it must be a single product in the array, otherwise an error will happen.\n\nFree Trial cannot have more than 100 seats.\n\navailableNames contains customer names from vendor's system to be available in Keeper for customer company creation\n","operationId":"addEnterprise","parameters":[{"in":"body","name":"body","description":"Enterprise to be added","required":true,"schema":{"$ref":"#/components/schemas/EnterpriseAdd"}}],"responses":{"200":{"description":"successful operation","content":{"application/json":{"schema":{"$ref":"#/components/schemas/EnterpriseAddResponse"}}}},"405":{"description":"Invalid input"}}}},"/enterprise/{enterpriseId}":{"get":{"tags":["enterprise"],"summary":"Returns Keeper MSP enterprise by Enterprise Id","description":"All available information on the enterprise is returned at once","operationId":"getEnterprise","parameters":[{"name":"enterpriseId","in":"path","description":"Keeper Enterprise Id","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"successful operation","content":{"application/json":{"schema":{"$ref":"#/components/schemas/EnterpriseResponse"}}}},"400":{"description":"Invalid status value"}}}},"/license/{enterpriseId}":{"post":{"tags":["license"],"summary":"Adjust license for enterprise","description":"Adds or removes seats from the products mix.\n\nIf enterprise was on the free trial, it will be converted to paid license.\n","operationId":"postLicenseChange","parameters":[{"in":"body","name":"body","description":"List of license adjustments","required":true,"schema":{"$ref":"#/components/schemas/LicenseAdjustment"}}],"responses":{"200":{"description":"successful operation","content":{"application/json":{"schema":{"$ref":"#/components/schemas/EnterpriseResponse"}}}},"405":{"description":"Invalid input"}}},"delete":{"tags":["license"],"summary":"Expire the MSP license","description":"Delete will deactivate the licenses for the MSP and customers, and send the emails to admins.\n","operationId":"deleteLicense","parameters":[{"in":"query","name":"deleteAt","description":"Optional parameter to schedule the deletion","schema":{"type":"integer"}}],"responses":{"204":{"description":"successful operation"},"405":{"description":"Invalid input"}}}}},"components":{"schemas":{"EnterpriseBase":{"type":"object","required":["name"],"properties":{"name":{"type":"string","example":"Craig's Computer Services"},"email":{"type":"string","description":"MSP admintistrator email","example":"craig@gmail.com"},"region":{"type":"string","enum":["usa","europe"],"example":"usa"},"license":{"$ref":"#/components/schemas/License"}}},"EnterpriseAdd":{"allOf":[{"$ref":"#/components/schemas/EnterpriseBase"},{"type":"object","properties":{"availableNames":{"type":"array","description":"Customer names from vendor's system to be available in Keeper for customer company creation","items":{"type":"string"},"example":["Bob's Bakery","Country Sports"]}}}]},"EnterpriseAddResponse":{"allOf":[{"type":"object","properties":{"enterpriseId":{"type":"integer","example":3475834}}},{"$ref":"#/components/schemas/EnterpriseBase"}]},"EnterpriseResponse":{"allOf":[{"$ref":"#/components/schemas/EnterpriseAddResponse"},{"type":"object","properties":{"customers":{"$ref":"#/components/schemas/Customers"}}}]},"Customer":{"type":"object","required":["name"],"properties":{"enterpriseId":{"type":"integer","example":3245554},"name":{"type":"string","example":"Bob's Bakery"},"productId":{"type":"string","enum":["business","businessPlus","enterprise","enterprisePlus"]},"seats":{"type":"integer","description":"seats of productId allocated to the customer","example":15},"users":{"type":"integer","description":"current users count","example":12}}},"Customers":{"type":"array","items":{"$ref":"#/components/schemas/Customer"},"example":[{"enterpriseId":3245554,"name":"Bob's Bakery","productId":"businessPlus","seats":10,"users":7},{"enterpriseId":4455667,"name":"Country Sports","productId":"enterprise","seats":15,"users":12}]},"Product":{"type":"object","properties":{"productId":{"type":"string","enum":["freeTrial","business","businessPlus","enterprise","enterprisePlus"],"example":"businessPlus"},"seats":{"type":"integer","example":100}}},"Products":{"type":"array","items":{"$ref":"#/components/schemas/Product"},"example":[{"productId":"businessPlus","seats":80},{"productId":"enterprise","seats":40}]},"LicenseAdjustment":{"type":"array","items":{"$ref":"#/components/schemas/Product"},"example":[{"productId":"businessPlus","seats":-10},{"productId":"enterprise","seats":2}]},"License":{"type":"object","properties":{"products":{"type":"array","items":{"$ref":"#/components/schemas/Products"}}}}}}}/*intellij-swagger-spec-end*/,
+        validatorUrl: null,
+        dom_id: '#swagger-ui',
+        deepLinking: true,
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIStandalonePreset
+        ],
+        plugins: [
+          SwaggerUIBundle.plugins.DownloadUrl
+        ],
+        layout: "StandaloneLayout"
+      })
+
+      window.ui = ui
+    }
+  </script>
+  </body>
+</html>
